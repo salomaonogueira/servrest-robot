@@ -1,3 +1,50 @@
+## 🤖 Automação com Robot Framework
+
+Este projeto inclui testes automatizados com **Robot Framework + Python + Selenium** para API e UI do ServeRest.
+
+### Estrutura dos Testes
+
+```
+servrest/
+├── .github/workflows/
+│   ├── api-tests.yml       # CI para testes de API
+│   ├── ui-tests.yml        # CI para testes de UI (Selenium)
+│   └── all-tests.yml       # Workflow orquestrador
+├── resources/
+│   ├── api/                # Keywords de API (login, usuarios, produtos, carrinhos)
+│   └── ui/                 # Keywords de UI (páginas via Selenium)
+├── tests/
+│   ├── api/                # Testes de API (login, usuarios, produtos, carrinhos)
+│   └── ui/                 # Testes de UI (login, cadastro, produtos)
+└── requirements.txt
+```
+
+### Como executar localmente
+
+```bash
+pip install -r requirements.txt
+
+# Testes de API
+robot --outputdir results/api tests/api/
+
+# Testes de UI (modo headless)
+robot --outputdir results/ui --variable HEADLESS:true tests/ui/
+
+# Todos os testes
+robot --outputdir results tests/
+
+# Filtrar por tag
+robot --include smoke tests/
+```
+
+### Tags disponíveis
+- `smoke` — testes essenciais do caminho feliz
+- `negativo` — cenários de erro e validação
+- `ui` — apenas testes de interface
+- `login`, `usuarios`, `produtos`, `carrinhos` — por domínio
+
+---
+
 ## 📌 Sobre o Projeto  
 
 A **[ServRest API](https://serverest.dev/)** é uma API REST gratuita que simula um **e-commerce**, permitindo testes de requisições HTTP. Esta API possibilita a prática de **testes manuais** e **testes automatizados** com **Postman** e **GitHub Actions**, abrangendo funcionalidades como:  
