@@ -1,0 +1,7 @@
+tasks:
+  API Tests:
+    command: robot --outputdir results/api tests/api/
+  UI Tests:
+    command: robot --outputdir results/ui tests/ui/
+  All Tests:
+    command: robot --outputdir results tests/

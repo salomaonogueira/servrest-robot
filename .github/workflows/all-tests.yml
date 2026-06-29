@@ -1,0 +1,42 @@
+name: Todos os Testes - ServeRest
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Suite de testes'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - api
+          - ui
+
+jobs:
+  api:
+    name: Testes de API
+    uses: ./.github/workflows/api-tests.yml
+    if: ${{ github.event.inputs.suite == 'all' || github.event.inputs.suite == 'api' || github.event.inputs.suite == '' }}
+
+  ui:
+    name: Testes de UI
+    uses: ./.github/workflows/ui-tests.yml
+    if: ${{ github.event.inputs.suite == 'all' || github.event.inputs.suite == 'ui' || github.event.inputs.suite == '' }}
+
+  summary:
+    name: Sumário Final
+    runs-on: ubuntu-latest
+    needs: [api, ui]
+    if: always()
+    steps:
+      - name: Resultado final
+        run: |
+          echo "## Execução Completa - ServeRest" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| API   | ${{ needs.api.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| UI    | ${{ needs.ui.result }} |" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,76 @@
+name: API Tests - ServeRest
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'tests/api/**'
+      - 'resources/api/**'
+      - 'requirements.txt'
+      - '.github/workflows/api-tests.yml'
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 8 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Tags para filtrar testes (ex: smoke, negativo)'
+        required: false
+        default: ''
+
+jobs:
+  api-tests:
+    name: Executar Testes de API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Executar testes de API
+        run: |
+          TAGS="${{ github.event.inputs.tags }}"
+          if [ -n "$TAGS" ]; then
+            robot --outputdir results/api --include "$TAGS" tests/api/
+          else
+            robot --outputdir results/api tests/api/
+          fi
+
+      - name: Publicar relatório Robot Framework
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-test-results-${{ github.run_number }}
+          path: results/api/
+          retention-days: 30
+
+      - name: Publicar sumário no GitHub
+        if: always()
+        run: |
+          echo "## Resultados dos Testes de API" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f results/api/output.xml ]; then
+            python -c "
+          import xml.etree.ElementTree as ET
+          tree = ET.parse('results/api/output.xml')
+          root = tree.getroot()
+          stats = root.find('.//statistics/total/stat')
+          if stats is not None:
+              total = int(stats.get('pass', 0)) + int(stats.get('fail', 0))
+              passed = int(stats.get('pass', 0))
+              failed = int(stats.get('fail', 0))
+              print(f'| Total | Passou | Falhou |')
+              print(f'|-------|--------|--------|')
+              print(f'| {total} | {passed} | {failed} |')
+          " >> $GITHUB_STEP_SUMMARY
+          fi
