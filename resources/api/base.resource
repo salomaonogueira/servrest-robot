@@ -2,7 +2,6 @@
 Library    RequestsLibrary
 Library    Collections
 Library    String
-Library    FakerLibrary    locale=pt_BR
 
 *** Variables ***
 ${BASE_URL}        https://serverest.dev

@@ -3,10 +3,11 @@ Resource    base.resource
 
 *** Keywords ***
 Gerar Dados Produto
-    ${nome}=        FakerLibrary.Word
-    ${sufixo}=      FakerLibrary.Numerify    text=####
-    ${preco}=       FakerLibrary.Random Int    min=10    max=9999
-    ${descricao}=   FakerLibrary.Sentence    nb_words=5
+    ${faker}=       Evaluate    __import__('faker').Faker('pt_BR')
+    ${nome}=        Evaluate    $faker.word()
+    ${sufixo}=      Evaluate    str(__import__('random').randint(1000, 9999))
+    ${preco}=       Evaluate    __import__('random').randint(10, 9999)
+    ${descricao}=   Evaluate    $faker.sentence(nb_words=5)
     ${dados}=       Create Dictionary
     ...    nome=${nome} ${sufixo}
     ...    preco=${preco}

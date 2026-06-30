@@ -1,12 +1,14 @@
 *** Settings ***
+Library    String
 Resource    base.resource
 Resource    login_keywords.resource
 
 *** Keywords ***
 Gerar Dados Usuario
-    ${nome}=      FakerLibrary.Name
-    ${email}=     FakerLibrary.Email
-    ${senha}=     FakerLibrary.Password    length=8    special_chars=False
+    ${faker}=     Evaluate    __import__('faker').Faker('pt_BR')
+    ${nome}=      Evaluate    $faker.name()
+    ${email}=     Evaluate    $faker.unique.email()
+    ${senha}=     Evaluate    $faker.password(length=8, special_chars=False)
     ${dados}=     Create Dictionary
     ...    nome=${nome}
     ...    email=${email}
