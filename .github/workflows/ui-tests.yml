@@ -26,6 +26,18 @@ on:
         options:
           - chrome
           - firefox
+  workflow_call:
+    inputs:
+      tags:
+        description: 'Tags para filtrar testes'
+        required: false
+        default: ''
+        type: string
+      browser:
+        description: 'Navegador para executar os testes'
+        required: false
+        default: 'chrome'
+        type: string
 
 jobs:
   ui-tests:
